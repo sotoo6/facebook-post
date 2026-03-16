@@ -24,6 +24,8 @@ export class DesktopFacebookPost {
         console.error('Error cargando el JSON:', err);
       }
     });
+
+
   }
 }
 
