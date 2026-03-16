@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-desktop-facebook-post',
-  imports: [JsonPipe],
+  imports: [],
   templateUrl: './desktop-facebook-post.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
