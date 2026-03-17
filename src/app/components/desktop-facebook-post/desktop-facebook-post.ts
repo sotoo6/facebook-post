@@ -6,7 +6,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   selector: 'app-desktop-facebook-post',
   imports: [],
   templateUrl: './desktop-facebook-post.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DesktopFacebookPost {
 
