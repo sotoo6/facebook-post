@@ -1,0 +1,109 @@
+<form class="fieldset flex flex-col gap-2 bg-base-200 border-base-300 rounded-box w-xl border p-6" autocomplete="off" [formGroup]="myForm"
+  (ngSubmit)="onSubmit()">
+  <!-- Input nombre de usuario -->
+  <label class="input validator w-full">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="icon icon-tabler icons-tabler-outline icon-tabler-user">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+      <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+    </svg>
+    <input type="text" placeholder="Nombre de usuario" formControlName="userName" />
+  </label>
+  <!-- Texto error de nombre de usuario -->
+  @if (formUtils.isValidField(myForm, 'userName')) {
+  <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['userName'].errors!) }}</span>
+  }
+
+  <!-- Input nombre de la cuenta -->
+  <label class="input validator w-full">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="icon icon-tabler icons-tabler-outline icon-tabler-user">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+      <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+    </svg>
+    <input type="text" placeholder="Nombre de la cuenta" formControlName="userAcount" />
+  </label>
+  <!-- Texto error de nombre de usuario -->
+  @if (formUtils.isValidField(myForm, 'userAcount')) {
+  <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['userAcount'].errors!) }}</span>
+  }
+
+  <!-- Input de la foto de perfil -->
+  <div>
+    <span class="label text-base mr-3">Imagen de perfil</span>
+    <input type="file" accept="image/*" class="file-input file-input-secondary w-fit"
+      (change)="onUserImageSelected($event)" />
+  </div>
+  <!-- Texto error de foto de perfil -->
+  @if (formUtils.isValidField(myForm, 'userImage')) {
+  <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['userImage'].errors!) }}</span>
+  }
+
+  <!-- Input imagen/video del post -->
+  <div>
+    <span class="label text-base mr-3">Imagen para el post</span>
+    <input type="file" accept="image/*,video/*" class="file-input file-input-secondary w-fit"
+      (change)="onPostMediaSelected($event)" />
+  </div>
+  <!-- Texto error de foto del post -->
+  @if (formUtils.isValidField(myForm, 'postImage')) {
+  <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['postMedia'].errors!) }}</span>
+  }
+
+  <!-- TextArea Descripción -->
+  <textarea class="textarea w-full" placeholder="Descripción" formControlName="description">
+  </textarea>
+  <!-- Texto error de descripcion -->
+  @if (formUtils.isValidField(myForm, 'description')) {
+  <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['description'].errors!) }}</span>
+  }
+
+  <!-- Checkbox de verificación de la cuenta -->
+  <div class="flex">
+    <span class="label text-base mr-3">Cuenta verificada</span>
+    <input type="checkbox" class="checkbox checkbox-primary" />
+  </div>
+
+  <label class="input validator w-full">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="icon icon-tabler icons-tabler-outline icon-tabler-tags">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path
+        d="M3 8v4.172a2 2 0 0 0 .586 1.414l5.71 5.71a2.41 2.41 0 0 0 3.408 0l3.592 -3.592a2.41 2.41 0 0 0 0 -3.408l-5.71 -5.71a2 2 0 0 0 -1.414 -.586h-4.172a2 2 0 0 0 -2 2" />
+      <path d="M18 19l1.592 -1.592a4.82 4.82 0 0 0 0 -6.816l-4.592 -4.592" />
+      <path d="M7 10h-.01" />
+    </svg>
+
+    <input #tagInput type="text" placeholder="Tags sobre el post" />
+  </label>
+  <!-- Texto error de tags -->
+  @if (formUtils.isValidField(myForm, 'tags')) {
+  <span class="form-text text-error pb-1 block mt-1">
+    {{ formUtils.getTextError(myForm.controls['tags'].errors!) }}
+  </span>
+  }
+
+  <div class="mt-1.5 flex gap-2 flex-wrap">
+    <button type="button" class="btn btn-sm btn-primary" (click)="addTagFromButton(tagInput)">
+      Añadir tag
+    </button>
+  </div>
+
+  <div class="mt-4 flex flex-wrap gap-2">
+    @for (tag of tagsList; track tag) {
+    <div class="badge badge-outline badge-primary gap-2 px-3 py-3">
+      {{ tag }}
+      <button type="button" class="ml-1 text-xs hover:cursor-pointer" (click)="removeTag(tag)">
+        ✕
+      </button>
+    </div>
+    }
+  </div>
+
+  <button class="btn btn-accent mt-4" (click)="onSubmit()">Crear Post</button>
+</form>

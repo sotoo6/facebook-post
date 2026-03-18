@@ -1,30 +1,41 @@
-import { JsonPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-desktop-facebook-post',
+  selector: 'facebook-post',
   imports: [],
   templateUrl: './desktop-facebook-post.html',
 })
 export class DesktopFacebookPost {
 
-  data: any = {};
 
-  constructor(private http: HttpClient) {}
+  // Se inyecta HttpClient para leer el archivo JSON
+  constructor(private http: HttpClient) { }
+
+  // Aquí guardaremos el post ya preparado para la plantilla
+  data: any = {
+    author: {},
+    time_created: '',
+    visibility: '',
+    text: '',
+    media: {},
+    stats: {
+      reactions: {}
+    },
+    comments: []
+  };
 
   ngOnInit(): void {
-    this.http.get<any>('/data.json').subscribe({
-      next: (respuesta) => {
-        console.log(respuesta);
-        this.data = respuesta.post;
-      },
-      error: (err) => {
-        console.error('Error cargando el JSON:', err);
-      }
-    });
+    // Busca en localStorage el post guardado desde el formulario
+    const savedPost = localStorage.getItem('generatedPost');
 
+    // Si existe, lo convierte de texto a objeto
+    if (savedPost) {
+      const parsedData = JSON.parse(savedPost);
 
+      // Como el JSON viene dentro de "post", cogemos solo esa parte
+      this.data = parsedData.post;
+    }
   }
 }
 

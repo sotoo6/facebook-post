@@ -1,20 +1,20 @@
 import { Routes } from '@angular/router';
-import { DesktopFacebookPost } from './components/desktop-facebook-post/desktop-facebook-post';
-import { FacebookForm } from './pages/facebook-form/facebook-form';
+import { FormPage } from './pages/form-page/form-page';
+import { PostPage } from './pages/post-page/post-page';
 
 export const routes: Routes = [
   {
-    path: 'desktop-post',
-    component: DesktopFacebookPost,
-    title: 'Facebook Desktop Post'
-  },
-  {
     path: 'facebook-form',
-    component: FacebookForm,
+    component: FormPage,
     title: 'Facebook Form'
   },
   {
+    path: 'facebook-post',
+    component: PostPage,
+    title: 'Facebook Post'
+  },
+  {
     path: '**',
-    redirectTo: 'desktop-post'
+    redirectTo: 'facebook-form'
   }
 ];
