@@ -1,13 +1,18 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtils } from '../../utils/form-utils';
 import { Router, RouterLink } from '@angular/router';
+import { Post } from '../../models/post.model';
+
 @Component({
   selector: 'facebook-form',
   imports: [ReactiveFormsModule],
   templateUrl: './facebook-form.html',
 })
-export class FacebookForm {
+export class FacebookForm implements OnInit {
+
+  // variable para guardar los post del localstorage
+  posts: Post[] = [];
 
   // Se inyecta FormBuilder para crear el formulario reactivo
   fb = inject(FormBuilder);
@@ -38,6 +43,15 @@ export class FacebookForm {
     tags: this.fb.control<string[]>([], [Validators.required]),
     verified: [true]
   })
+
+  ngOnInit(): void {
+    // leemos posts preesxisgtentes del local storage
+    // Busca en localStorage el post guardado desde el formulario
+    const savedPosts = localStorage.getItem('generatedPost') || "";
+    this.posts = JSON.parse(savedPosts);
+    console.log(this.posts);
+
+  }
 
   // Agregar nuevo tag
   addTag(event?: KeyboardEvent) {
@@ -205,19 +219,18 @@ export class FacebookForm {
     const formValue = this.myForm.value;
 
     // Crea el JSON final
-    const jsonData = {
-      post: {
+    const jsonData: Post = {
         id: 'post_001',
         author: {
-          name: formValue.userName,
-          username: formValue.userAcount,
-          verified: formValue.verified,
+          name: formValue.userName || 'Anónimo',
+          username: formValue.userAcount || 'Anónimo',
+          verified: formValue.verified || false,
           avatar: this.userImageBase64
         },
-        created_at: new Date().toISOString(),
+        created_at: new Date(),
         time_created: "2 h",
         visibility: "public",
-        text: formValue.description,
+        text: formValue.description || 'No tengo nada que decir',
         tags: this.tagsList,
         media: {
           type: this.postMediaType,
@@ -234,11 +247,15 @@ export class FacebookForm {
             avatar: this.userImageBase64
           }
         ]
-      }
     };
 
+    // Añadimos el post al array de posts del local sotorage
+    this.posts.push(jsonData);
+
     // Guarda el post en localStorage
-    localStorage.setItem('generatedPost', JSON.stringify(jsonData));
+    console.log(this.posts)
+
+    localStorage.setItem('generatedPost', JSON.stringify(this.posts));
 
     // Redirige a la pantalla del post
     this.router.navigate(['/facebook-post']);

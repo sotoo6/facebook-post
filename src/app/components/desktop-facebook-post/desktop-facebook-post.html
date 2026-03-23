@@ -2,14 +2,14 @@
 
   <!-- Header -->
   <div class="flex items-center p-3">
-    <img class="w-10 h-10 rounded-full mr-3" src="{{ data.author?.avatar }}" alt="Foto usuario">
+    <img class="w-10 h-10 rounded-full mr-3" src="{{ data.author.avatar }}" alt="Foto usuario">
 
     <div class="flex flex-col">
       <div class="flex items-center gap-1">
         <span class="font-semibold text-gray-900">
-          {{ data.author?.name }}
+          {{ data.author.name }}
         </span>
-        @if (data.author?.verified) {
+        @if (data.author.verified) {
         <img class="w-fit h-4" alt=""
           referrerpolicy="origin-when-cross-origin"
           src="https://static.xx.fbcdn.net/assets/?set=content_operations_help_center&amp;name=fb-verifiedbadge-desktop&amp;density=1">
@@ -92,7 +92,7 @@
   </button>
 
   <div class="mt-4 flex gap-2 px-4 pb-4">
-    <img src="{{ data.comments?.[0]?.avatar }}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">
+    <img src="{{ data.comments[0]?.avatar }}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">
 
     <div class="flex-1">
       <div class="inline-block max-w-full rounded-2xl bg-gray-100 px-3 py-2">

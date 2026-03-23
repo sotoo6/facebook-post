@@ -24,7 +24,7 @@ export class PostPage {
 
   rebootPost() {
     // Borra el localStorage
-    localStorage.removeItem("generatedPost");
+    // localStorage.removeItem("generatedPost");
 
     // Redirige a la pantalla del post
     this.router.navigate(['/facebook-form']);
