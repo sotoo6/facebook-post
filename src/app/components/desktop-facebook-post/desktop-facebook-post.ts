@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Post } from '../../models/post.model';
+import { FacebookPostService } from '../../services/facebook-post.service';
 
 @Component({
   selector: 'facebook-post',
@@ -9,13 +10,14 @@ import { Post } from '../../models/post.model';
 })
 export class DesktopFacebookPost implements OnInit {
 
+  facebookPostService = inject(FacebookPostService)
 
   // Se inyecta HttpClient para leer el archivo JSON
   constructor(private http: HttpClient) { }
 
   // Aquí guardaremos el post ya preparado para la plantilla
   data: Post = {
-    id: "",
+    id: 0,
     created_at: new Date(),
     tags: [],
     author: {
@@ -27,6 +29,7 @@ export class DesktopFacebookPost implements OnInit {
     time_created: '',
     visibility: '',
     text: '',
+    theme: '',
     media: null,
     likes: 0,
     numComments: 0,
@@ -36,14 +39,13 @@ export class DesktopFacebookPost implements OnInit {
 
   ngOnInit(): void {
     // Busca en localStorage el post guardado desde el formulario
-    const savedPosts = localStorage.getItem('generatedPost') || "";
-    const savedPostsObject: Post[] = JSON.parse(savedPosts);
-    const lastIndex = savedPostsObject.length - 1;
+    const savedPosts: Post[] = this.facebookPostService.getPost();
+
+    const lastIndex = savedPosts.length - 1;
 
     if (lastIndex >=0 ){
-      const savedPost = (savedPostsObject.length > 0) ? savedPostsObject[lastIndex] : null;
+      const savedPost = (savedPosts.length > 0) ? savedPosts[lastIndex] : null;
       console.log(savedPost);
-
 
       // Si existe, lo convierte de texto a objeto
       if (savedPost) {

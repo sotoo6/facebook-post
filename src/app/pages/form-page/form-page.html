@@ -1,10 +1,11 @@
-<div class="text-center my-8">
-  <h1 class="inline-block text-3xl md:text-4xl font-bold text-slate-500 relative">
+<div class="text-center my-4">
+  <h1 class="inline-block text-2xl md:text-3xl font-bold text-slate-500 relative">
     Crea una publicación en Facebook
-    <span class="block w-full h-1 mt-2 rounded-full bg-blue-300/70"></span>
+    <span class="block w-full h-1 mt-1.5 rounded-full bg-blue-300/70"></span>
   </h1>
 </div>
-<section class="flex justify-center mt-10">
-  <facebook-form />
+<section class="flex justify-center gap-8 w-full">
+  <facebook-form [postToEdit]="selectedPost" />
+  <select-post (postSelected)="onPostSelected($event)" />
 </section>
 

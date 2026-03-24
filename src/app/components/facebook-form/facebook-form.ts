@@ -1,8 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, input, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtils } from '../../utils/form-utils';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { Post } from '../../models/post.model';
+import { FacebookPostService } from '../../services/facebook-post.service';
 
 @Component({
   selector: 'facebook-form',
@@ -16,6 +17,9 @@ export class FacebookForm implements OnInit {
 
   // Se inyecta FormBuilder para crear el formulario reactivo
   fb = inject(FormBuilder);
+  router = inject(Router);
+  facebookPostService = inject(FacebookPostService);
+
   // Referencia a la clase de utilidades del formulario
   // Se usa para acceder a validaciones y métodos auxiliares
   formUtils = FormUtils;
@@ -25,13 +29,23 @@ export class FacebookForm implements OnInit {
 
   // Guarda la imagen de perfil convertida a base64
   userImageBase64: string = '';
+  previewUserImage: string = '';
+  selectedUserImageName: string = '';
+
   // Guarda el archivo del post en base64
   postMediaBase64: string = '';
 
   // Guarda el tipo de archivo: image o video
-  postMediaType: string = '';
+  previewPostMedia: string = '';
+  selectedPostMediaName: string = '';
+  postMediaType: 'image' | 'video' | '' = '';
 
-  router = inject(Router)
+
+
+
+  postToEdit = input<Post | null>(null);
+
+
 
   // Definición del formulario reactivo principal
   myForm = this.fb.group({
@@ -41,13 +55,13 @@ export class FacebookForm implements OnInit {
     postMedia: ['', Validators.required],
     description: ['', [Validators.required, Validators.maxLength(150)]],
     tags: this.fb.control<string[]>([], [Validators.required]),
-    verified: [true]
+    verified: [false]
   })
 
   ngOnInit(): void {
     // leemos posts preesxisgtentes del local storage
     // Busca en localStorage el post guardado desde el formulario
-    const savedPosts = localStorage.getItem('generatedPost') || "";
+    const savedPosts = localStorage.getItem('generatedPost') || "[]";
     this.posts = JSON.parse(savedPosts);
     console.log(this.posts);
 
@@ -133,13 +147,32 @@ export class FacebookForm implements OnInit {
     const file = input.files?.[0];
 
     // Si no hay archivo, no hace nada
-    if (!file) return;
+    if (!file) {
+      this.previewUserImage = '';
+      this.selectedUserImageName = '';
+      this.userImageBase64 = '';
+      this.myForm.get('userImage')?.setValue('');
+      return;
+    }
 
-    // Convierte la imagen a base64 y la guarda
+    // Para mostrar la imagen
+    this.previewUserImage = URL.createObjectURL(file);
+
+    // Para enseñar el nombre y tamaño
+    this.selectedUserImageName = `${file.name} [${this.formatFileSize(file.size)}]`;
+
+    // Para guardar en el formulario
+    this.myForm.get('userImage')?.setValue(file.name);
+
+    // Para guardar la imagen en base64
     this.userImageBase64 = await this.fileToBase64(file);
 
-    // Marca el campo del formulario como completado
-    this.myForm.get('userImage')?.setValue(file.name);
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   // Guarda la imagen o vídeo del post en base64
@@ -148,20 +181,39 @@ export class FacebookForm implements OnInit {
     const file = input.files?.[0];
 
     // Si no hay archivo, se detiene
-    if (!file) return;
+    if (!file) {
+      this.previewPostMedia = '';
+      this.selectedPostMediaName = '';
+      this.postMediaBase64 = '';
+      this.postMediaType = '';
+      this.myForm.get('postMedia')?.setValue('');
+      return;
+    }
 
-    // Convierte el archivo a base64
-    this.postMediaBase64 = await this.fileToBase64(file);
+    if (this.previewPostMedia) {
+      URL.revokeObjectURL(this.previewPostMedia);
+    }
+
+    // Para mostrar la imagen
+    this.previewPostMedia = URL.createObjectURL(file);
+
+    // Para enseñar el nombre y tamaño
+    this.selectedPostMediaName = `${file.name} [${this.formatFileSize(file.size)}]`;
 
     // Guarda si es imagen o vídeo
     if (file.type.startsWith('image/')) {
       this.postMediaType = 'image';
     } else if (file.type.startsWith('video/')) {
       this.postMediaType = 'video';
+    } else {
+      this.postMediaType = '';
     }
 
     // Marca el campo como completado
     this.myForm.get('postMedia')?.setValue(file.name);
+
+    // Convierte el archivo a base64
+    this.postMediaBase64 = await this.fileToBase64(file);
   }
 
   // Descarga el objeto como archivo JSON
@@ -191,11 +243,24 @@ export class FacebookForm implements OnInit {
 
   getRandomComments() {
     return Math.floor(Math.random() * 6) + 2;
-
   }
 
   getRandomShareds() {
     return Math.floor(Math.random() * 30) + 10;
+  }
+
+  getPostId(): number {
+    const savedPosts = localStorage.getItem('generatedPost');
+
+    if (!savedPosts) return 1;
+
+    const posts: Post[] = JSON.parse(savedPosts);
+
+    if (posts.length === 0 ) return 1;
+
+    const maxId = Math.max(...posts.map(post => post.id));
+
+    return maxId + 1;
 
   }
 
@@ -220,7 +285,7 @@ export class FacebookForm implements OnInit {
 
     // Crea el JSON final
     const jsonData: Post = {
-        id: 'post_001',
+        id: this.getPostId(),
         author: {
           name: formValue.userName || 'Anónimo',
           username: formValue.userAcount || 'Anónimo',
@@ -232,6 +297,7 @@ export class FacebookForm implements OnInit {
         visibility: "public",
         text: formValue.description || 'No tengo nada que decir',
         tags: this.tagsList,
+        theme: "General",
         media: {
           type: this.postMediaType,
           file_base64: this.postMediaBase64
@@ -250,15 +316,17 @@ export class FacebookForm implements OnInit {
     };
 
     // Añadimos el post al array de posts del local sotorage
-    this.posts.push(jsonData);
+    // this.posts.push(jsonData);
 
     // Guarda el post en localStorage
-    console.log(this.posts)
-
-    localStorage.setItem('generatedPost', JSON.stringify(this.posts));
+    // localStorage.setItem('generatedPost', JSON.stringify(this.posts));
 
     // Redirige a la pantalla del post
+    // this.router.navigate(['/facebook-post']);
+
+    this.facebookPostService.addPost(jsonData);
     this.router.navigate(['/facebook-post']);
 
   }
+
 }

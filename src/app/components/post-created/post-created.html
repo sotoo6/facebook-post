@@ -1,0 +1,56 @@
+<div (click)="postSeleccionado()" class="card flex flex-row shadow-sm items-stretch bg-base-100 w-95 cursor-pointer hover:shadow-xl transition-all overflow-hidden">
+  <!-- Parte izquierda -->
+  <div class="w-2/4">
+    <div class="card-body p-4">
+
+      <div class="flex items-center gap-3">
+        @if (post().author.avatar) {
+          <img
+            [src]="post().author.avatar"
+            alt="Avatar"
+            class="w-10 h-10 rounded-full object-cover">
+        } @else {
+          <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold">
+            {{ post().author.name.charAt(0) }}
+          </div>
+        }
+
+        <div>
+          <div class="flex justify-center items-center gap-1">
+            <h3 class="font-semibold text-base">{{ post().author.name }}</h3>
+            @if (post().author.verified) {
+          <img class="w-fit h-4" alt="verificacion" src="https://static.xx.fbcdn.net/assets/?set=content_operations_help_center&amp;name=fb-verifiedbadge-desktop&amp;density=1">
+        }
+          </div>
+          <p class="text-xs text-gray-500">{{ post().created_at | date }}</p>
+        </div>
+      </div>
+
+      <p class="text-sm mt-3 line-clamp-2">
+        {{ post().text }}
+      </p>
+
+      <div class="mt-2 flex gap-2 flex-wrap">
+        @for (tag of post().tags; track tag) {
+          <span class="badge badge-outline text-xs text-primary">{{ tag }}</span>
+        }
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Parte derecha -->
+  <div class="w-2/4 h-50 flex items-center justify-center">
+    @if (post().media && post().media!.type.startsWith('image')) {
+      <img
+        [src]="post().media!.file_base64"
+        alt="post"
+        class="w-full h-full object-cover">
+    } @else {
+      <div class="w-full h-full min-h-55 bg-gray-300 flex items-center justify-center text-sm font-bold">
+        Sin imagen
+      </div>
+    }
+  </div>
+
+</div>
