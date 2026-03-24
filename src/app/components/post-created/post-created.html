@@ -1,5 +1,5 @@
 <div (click)="postSeleccionado()" class="card flex flex-row shadow-sm items-stretch bg-base-100 w-95 cursor-pointer hover:shadow-xl transition-all overflow-hidden">
-  <!-- Parte izquierda -->
+  <!-- Datos post -->
   <div class="w-2/4">
     <div class="card-body p-4">
 
@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <!-- Parte derecha -->
+  <!-- Imagen post -->
   <div class="w-2/4 h-50 flex items-center justify-center">
     @if (post().media && post().media!.type.startsWith('image')) {
       <img

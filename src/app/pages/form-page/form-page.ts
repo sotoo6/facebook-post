@@ -10,8 +10,10 @@ import { Post } from '../../models/post.model';
 })
 export class FormPage {
 
+  // Guarda el post que el usuario ha seleccionado
   selectedPost: Post | null = null;
 
+  // Asigna a selectedPost el post en el que se hizo clic
   onPostSelected(post: Post): void {
     this.selectedPost = post;
   }

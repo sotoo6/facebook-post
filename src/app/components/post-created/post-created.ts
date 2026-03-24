@@ -9,9 +9,13 @@ import { DatePipe } from '@angular/common';
 })
 export class PostCreated {
 
+  // Input obligatorio que recibe el post que se va a mostrar
   post = input.required<Post>();
+
+  // Evento que envía al componente padre el post seleccionado
   postSelected = output<Post>();
 
+  // Emite al componente padre el post actual cuando se selecciona
   postSeleccionado(): void {
     this.postSelected.emit(this.post());
   }
