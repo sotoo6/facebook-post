@@ -14,7 +14,8 @@ export class FormPage {
   selectedPost: Post | null = null;
 
   // Asigna a selectedPost el post en el que se hizo clic
-  onPostSelected(post: Post): void {
+  onPostSelected(post: Post | null): void {
     this.selectedPost = post;
   }
+
 }

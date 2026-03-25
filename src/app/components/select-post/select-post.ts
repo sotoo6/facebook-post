@@ -13,7 +13,7 @@ export class SelectPost {
   facebookPostService = inject(FacebookPostService);
 
   // Evento que envia el post seleccionado
-  postSelected = output<Post>();
+  postSelected = output<Post | null>();
 
   // Array de posts guardados
   savedPosts: Post[] = [];
@@ -36,6 +36,11 @@ export class SelectPost {
     this.selectedPost = post;
     // Envia el post seleccionado al componente padre
     this.postSelected.emit(post);
+  }
+
+  selectNewPost(): void {
+    this.selectedPost = null;
+    this.postSelected.emit(null);
   }
 
 }

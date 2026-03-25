@@ -1,17 +1,25 @@
 <div class="bg-base-200 border-base-300 rounded-box w-fit border px-8 py-5">
-  <h2 class="inline-block mb-3 text-xl md:text-xl font-bold text-slate-500 relative">Selecciona un post para editar</h2>
+  <h2 class="inline-block mb-5 text-xl md:text-xl font-bold text-slate-500 relative">
+    Selecciona un post para editar
+  </h2>
+
+  <!-- Tarjeta de nuevo post -->
+  <div class="card bg-base-100 shadow-sm cursor-pointer hover:shadow-md transition-all mb-4" (click)="selectNewPost()">
+    <div class="card-body">
+      <h3 class="font-bold text-lg">Nuevo post</h3>
+      <p class="text-sm text-gray-500">Pulsa aquí para limpiar el formulario</p>
+    </div>
+  </div>
 
   @if (savedPosts.length > 0) {
-  <div class="grid grid-cols-2 mt-2 overflow-y-auto gap-3 basis:max-h-155 lg:max-h-190 ">
-    @for (item of savedPosts; track item.id) {
-      <div (click)="selectPost(item)">
-        <post-created [post]="item"></post-created>
-      </div>
-    }
-  </div>
-} @else {
-    <p class="mt-4 text-sm text-gray-500">
-      No hay ningún post seleccionado.
-    </p>
+    <div class="grid grid-cols-2 mt-2 overflow-y-auto gap-3 max-h-155">
+      @for (item of savedPosts; track item.id) {
+        <div (click)="selectPost(item)">
+          <post-created [post]="item"></post-created>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="mt-4 text-sm text-gray-500">No hay posts guardados.</p>
   }
 </div>

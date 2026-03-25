@@ -104,9 +104,9 @@
       </div>
     }
   </div>
-    <!-- Texto error de foto del post -->
-  @if (formUtils.isValidField(myForm, 'postImage')) {
-  <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['postMedia'].errors!) }}</span>
+  <!-- Texto error de foto del post -->
+  @if (formUtils.isValidField(myForm, 'postMedia')) {
+    <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['postMedia'].errors!) }}</span>
   }
 
   <!-- TextArea Descripción -->
@@ -163,7 +163,5 @@
     </div>
   </div>
 
-
-
-  <button class="btn btn-accent mt-4" (click)="onSubmit()">Crear Post</button>
+  <button class="btn btn-accent mt-4" (click)="onSubmit()">{{ postToEdit() ? 'Modificar Post' : 'Crear Post' }}</button>
 </form>

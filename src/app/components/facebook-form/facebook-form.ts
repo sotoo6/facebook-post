@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import { Component, effect, inject, input, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtils } from '../../utils/form-utils';
 import { Router } from '@angular/router';
@@ -14,47 +14,95 @@ export class FacebookForm implements OnInit {
 
   // Se inyecta FormBuilder para crear el formulario reactivo
   fb = inject(FormBuilder);
-
   // Se inyecta Router para poder navegar entre páginas
   router = inject(Router);
-
   // Se inyecta el servicio que gestiona los posts guardados
   facebookPostService = inject(FacebookPostService);
 
   // Referencia a la clase de utilidades del formulario
   // Se usa para acceder a validaciones y métodos auxiliares
   formUtils = FormUtils;
-
   // Input que recibe un post si se quiere editar desde otro componente
   postToEdit = input<Post | null>(null);
-
   // Array donde se guardan los posts cargados desde localStorage
   posts: Post[] = [];
-
   // Array donde se almacenan los tags que añade el usuario
   tagsList: string[] = [];
 
   // Guarda la imagen de perfil en base64 para usarla o guardarla
   userImageBase64: string = '';
-
   // Guarda la URL temporal para mostrar la vista previa de la imagen de perfil
   previewUserImage: string = '';
-
   // Guarda el nombre y tamaño del archivo de imagen de perfil
   selectedUserImageName: string = '';
 
   // Guarda el archivo multimedia del post en base64
   postMediaBase64: string = '';
-
   // Guarda la URL temporal para mostrar la vista previa del archivo del post
   previewPostMedia: string = '';
-
   // Guarda el nombre y tamaño del archivo multimedia del post
   selectedPostMediaName: string = '';
-
   // Indica si el archivo del post es una imagen, un vídeo o ninguno
   postMediaType: 'image' | 'video' | '' = '';
 
+  post = this.postToEdit();
+
+  constructor() {
+    effect(() => {
+      const post = this.postToEdit();
+
+      if (!post) {
+        this.myForm.reset({
+          userName: '',
+          userAcount: '',
+          userImage: '',
+          postMedia: '',
+          description: '',
+          tags: [],
+          verified: false
+        });
+
+        this.tagsList = [];
+        this.userImageBase64 = '';
+        this.previewUserImage = '';
+        this.selectedUserImageName = '';
+        this.postMediaBase64 = '';
+        this.previewPostMedia = '';
+        this.selectedPostMediaName = '';
+        this.postMediaType = '';
+
+        return;
+      }
+
+      this.tagsList = [...post.tags];
+
+      this.myForm.patchValue({
+        userName: post.author.name,
+        userAcount: post.author.username,
+        userImage: post.author.avatar ? 'Imagen cargada' : '',
+        postMedia: post.media?.file_base64 ? 'Archivo cargado' : '',
+        description: post.text,
+        verified: post.author.verified,
+        tags: post.tags
+      });
+
+      this.userImageBase64 = post.author.avatar ?? '';
+      this.previewUserImage = post.author.avatar ?? '';
+      this.selectedUserImageName = post.author.avatar ? 'Imagen cargada' : '';
+
+      this.postMediaBase64 = post.media?.file_base64 ?? '';
+      this.previewPostMedia = post.media?.file_base64 ?? '';
+      this.selectedPostMediaName = post.media?.file_base64 ? 'Archivo cargado' : '';
+
+      if (post.media?.type.startsWith('image')) {
+        this.postMediaType = 'image';
+      } else if (post.media?.type.startsWith('video')) {
+        this.postMediaType = 'video';
+      } else {
+        this.postMediaType = '';
+      }
+    });
+  }
 
   // Definición del formulario reactivo principal
   myForm = this.fb.group({
@@ -64,7 +112,7 @@ export class FacebookForm implements OnInit {
     postMedia: ['', Validators.required],
     description: ['', [Validators.required, Validators.maxLength(150)]],
     tags: this.fb.control<string[]>([], [Validators.required]),
-    verified: [false]
+    verified: [false],
   })
 
   ngOnInit(): void {
