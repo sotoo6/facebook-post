@@ -166,6 +166,12 @@
     </div>
   </div>
 
-  <button class="btn btn-accent mt-4" (click)="onSubmit()">{{ postToEdit() ? 'Modificar Post' : 'Crear Post' }}</button>
+  <button type="submit" class="btn btn-accent mt-4">{{ postToEdit() ? 'Modificar Post' : 'Crear Post' }}</button>
 
 </form>
+
+@if (cargando) {
+  <div  class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <span class="loading loading-dots loading-lg text-blue-100"></span>
+  </div>
+}

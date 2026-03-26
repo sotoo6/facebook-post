@@ -1,4 +1,4 @@
-<div class="mt-5 max-w-lg mx-auto bg-white border border-gray-300 rounded-lg shadow-sm">
+<div class="mt-5 max-w-xl mx-auto bg-white border border-gray-300 rounded-lg shadow-sm">
 
   <!-- Header -->
   <div class="flex items-center p-3">
@@ -26,11 +26,11 @@
 
   <!-- Media -->
   @if (data.media?.type === 'image') {
-  <img class="w-full" [src]="data.media?.file_base64" alt="Artículo">
+    <img class="w-full max-h-150 object-cover" [src]="data.media?.file_base64" alt="Artículo">
   }
 
   @if (data.media?.type === 'video') {
-  <video class="w-full" [src]="data.media?.file_base64" controls autoplay muted playsinline></video>
+  <video class="w-full max-h-150 object-cover" [src]="data.media?.file_base64" controls autoplay muted playsinline></video>
   }
 
   <div class="border-t border-gray-200 px-4 py-3">

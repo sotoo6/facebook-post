@@ -24,7 +24,6 @@ export interface Author {
 export interface Comment {
   author: string;
   text: string;
-  likes: number;
   avatar: string;
 }
 

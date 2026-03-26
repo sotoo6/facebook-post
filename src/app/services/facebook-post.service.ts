@@ -3,37 +3,42 @@ import { effect, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Post } from '../models/post.model';
 
-// Carga los post en localStorage
+// Carga los posts desde localStorage
 const loadFromLocalStorage = (): Post[] => {
   const postFromLocalStorage = localStorage.getItem('generatedPost') ?? '[]';
   return JSON.parse(postFromLocalStorage);
-}
+};
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class FacebookPostService {
 
   router = inject(Router);
 
-  // Guarda el "historial" de posts del localStorage
-  postHistory = signal<Post[]>(loadFromLocalStorage())
+  // Guarda el historial de posts en una signal
+  postHistory = signal<Post[]>(loadFromLocalStorage());
 
-  // Cada vez que cambia postHistory, se vuelve a guardar en localStorage
+  // Cada vez que cambia postHistory, se guarda automáticamente en localStorage
   guardarPost = effect(() => {
     const historyString = JSON.stringify(this.postHistory());
     localStorage.setItem('generatedPost', historyString);
   });
 
-  // Añade un nuevo post al array de posts
+  // Añade un nuevo post
   addPost(post: Post): void {
     this.postHistory.update(posts => [...posts, post]);
   }
 
-  // Devuelve el array de post almacenados
+  // Devuelve los posts actuales
   getPost(): Post[] {
     return this.postHistory();
   }
 
-
-
+  // Actualiza un post existente buscando por id
+  updatePost(updatedPost: Post): void {
+    this.postHistory.update(posts =>
+      posts.map(post =>
+        post.id === updatedPost.id ? updatedPost : post
+      )
+    );
+  }
 }
-

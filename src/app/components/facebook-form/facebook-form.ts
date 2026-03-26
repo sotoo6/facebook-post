@@ -1,9 +1,20 @@
-import { Component, effect, inject, input, OnInit } from '@angular/core';
+import { Component, effect, EventEmitter, inject, input, OnInit, Output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtils } from '../../utils/form-utils';
 import { Router } from '@angular/router';
 import { Post } from '../../models/post.model';
 import { FacebookPostService } from '../../services/facebook-post.service';
+import { GeminiService } from '../../services/gemini.service';
+
+const NOMBRES_RANDOM = ['Juan Pérez', 'Maria García', 'Carlos Ruiz', 'Ana López', 'Roberto G.'];
+const AVATARES_RANDOM = [
+  'https://randomuser.me/api/portraits/women/44.jpg',
+  'https://randomuser.me/api/portraits/men/32.jpg',
+  'https://randomuser.me/api/portraits/women/68.jpg',
+  'https://randomuser.me/api/portraits/men/46.jpg',
+  'https://randomuser.me/api/portraits/women/24.jpg',
+  'https://randomuser.me/api/portraits/men/1.jpg'
+];
 
 @Component({
   selector: 'facebook-form',
@@ -45,7 +56,12 @@ export class FacebookForm implements OnInit {
   // Indica si el archivo del post es una imagen, un vídeo o ninguno
   postMediaType: 'image' | 'video' | '' = '';
 
-  constructor() {
+  // Evento que avisa que el post esta listo
+  @Output() postCreado = new EventEmitter<any>();
+
+  cargando: boolean = false;
+
+  constructor(private geminiService: GeminiService) {
     // Se ejecuta cuando cambia el postToEdit()
     effect(() => {
       // Guarda el post recibido
@@ -320,10 +336,6 @@ export class FacebookForm implements OnInit {
     return Math.floor(Math.random() * 5000) + 300;
   }
 
-  getRandomComments() {
-    return Math.floor(Math.random() * 6) + 2;
-  }
-
   getRandomShareds() {
     return Math.floor(Math.random() * 30) + 10;
   }
@@ -350,54 +362,75 @@ export class FacebookForm implements OnInit {
   }
 
   // Se ejecuta al enviar el formulario
-  onSubmit() {
+  async onSubmit() {
     event?.preventDefault()
 
     // Marca todos los campos como tocados
     this.myForm.markAllAsTouched();
-
     // Guarda los tags actuales dentro del formulario
     this.myForm.get('tags')?.setValue(this.tagsList);
-
     // Revisa otra vez las validaciones de tags
     this.myForm.get('tags')?.updateValueAndValidity();
 
     // Si el formulario no es válido, se detiene
     if (this.myForm.invalid) return;
 
+    // Servicio de Gemini inicio
+    this.cargando = true; // Activamos estado de carga
+    let comentariosIA: string[] = []
+
+    try {
+      // LLamamos al servicio usando los tags de tagsList
+      // Si no hay tags, le pasamos la descripcion del post como alternativa
+      const contexto = this.tagsList.length > 0 ? this.tagsList : [this.myForm.value.description || 'general'];
+
+      comentariosIA = await this.geminiService.generarComentarios(contexto);
+
+    } catch (error) {
+      console.error("Error obteniendo comentarios de Gemini", error);
+      // Comentario por defecto si falla la IA
+      comentariosIA = ['¡Qué buen post!'];
+
+    } finally {
+      this.cargando = false;
+    }
+
+    // Servicio de Gemini fin
+
     // Guarda los valores del formulario
     const formValue = this.myForm.value;
 
+    const editingPost = this.postToEdit();
+
     // Crea el JSON final
     const jsonData: Post = {
-        id: this.getPostId(),
-        author: {
-          name: formValue.userName || 'Anónimo',
-          username: formValue.userAcount || 'Anónimo',
-          verified: formValue.verified || false,
-          avatar: this.userImageBase64
-        },
-        created_at: new Date(),
-        time_created: "2 h",
-        visibility: "public",
-        text: formValue.description || 'No tengo nada que decir',
-        tags: this.tagsList,
-        theme: "General",
-        media: {
-          type: this.postMediaType,
-          file_base64: this.postMediaBase64
-        },
-        likes: this.getRandomLikes(),
-        numComments: this.getRandomComments(),
-        numShared: this.getRandomShareds(),
-        comments: [
-          {
-            author: 'Cristina Otero',
-            text: 'Qué sitio tan bonito, transmite una paz increíble 🌿✨',
-            likes: 2,
-            avatar: this.userImageBase64
-          }
-        ]
+      id: editingPost ? editingPost.id : this.getPostId(),
+      author: {
+        name: formValue.userName || 'Anónimo',
+        username: formValue.userAcount || 'Anónimo',
+        verified: formValue.verified || false,
+        avatar: this.userImageBase64
+      },
+      created_at: editingPost ? editingPost.created_at : new Date(),
+      time_created: editingPost ? editingPost.time_created : '2 h',
+      visibility: 'public',
+      text: formValue.description || 'No tengo nada que decir',
+      tags: this.tagsList,
+      theme: 'General',
+      media: {
+        type: this.postMediaType,
+        file_base64: this.postMediaBase64
+      },
+      likes: editingPost ? editingPost.likes : this.getRandomLikes(),
+      numComments: comentariosIA.length,
+      numShared: editingPost ? editingPost.numShared : this.getRandomShareds(),
+      comments: comentariosIA.map( textoDeIA => ({
+        author: NOMBRES_RANDOM[Math.floor(Math.random() * NOMBRES_RANDOM.length)],
+        text: textoDeIA,
+        avatar: AVATARES_RANDOM[Math.floor(Math.random() * AVATARES_RANDOM.length)],
+      })
+
+        )
     };
 
     // Añadimos el post al array de posts del local sotorage
@@ -409,7 +442,14 @@ export class FacebookForm implements OnInit {
     // Redirige a la pantalla del post
     // this.router.navigate(['/facebook-post']);
 
-    this.facebookPostService.addPost(jsonData);
+    // Si se ha editado se actualiza, sino se agrega
+    if (editingPost) {
+      this.facebookPostService.updatePost(jsonData);
+    } else {
+      this.facebookPostService.addPost(jsonData);
+    }
+
+    // Redirigimos al post
     this.router.navigate(['/facebook-post']);
 
   }
