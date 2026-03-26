@@ -1,26 +1,41 @@
-<div (click)="postSeleccionado()" class="card flex flex-row shadow-sm items-stretch bg-base-100 w-95 cursor-pointer hover:shadow-xl transition-all overflow-hidden">
+<div (click)="postSeleccionado()"
+  class="card relative group flex flex-row shadow-sm items-stretch bg-base-100 w-full h-full cursor-pointer hover:shadow-xl transition-all overflow-hidden">
+  <!-- Botón eliminar -->
+  <button type="button" (click)="$event.stopPropagation(); abrirModal()"
+    class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200  bg-white/90 hover:bg-red-50  hover:cursor-pointer rounded-full p-2 shadow"
+    aria-label="Eliminar publicación">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="icon icon-tabler icons-tabler-outline icon-tabler-trash hover:text-red-500">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M4 7l16 0" />
+      <path d="M10 11l0 6" />
+      <path d="M14 11l0 6" />
+      <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+      <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+    </svg>
+  </button>
+
   <!-- Datos post -->
-  <div class="w-2/4">
+  <div class="w-3/4">
     <div class="card-body p-4">
 
       <div class="flex items-center gap-3">
         @if (post().author.avatar) {
-          <img
-            [src]="post().author.avatar"
-            alt="Avatar"
-            class="w-10 h-10 rounded-full object-cover">
+        <img [src]="post().author.avatar" alt="Avatar" class="w-10 h-10 rounded-full object-cover">
         } @else {
-          <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold">
-            {{ post().author.name.charAt(0) }}
-          </div>
+        <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold">
+          {{ post().author.name.charAt(0) }}
+        </div>
         }
 
         <div>
           <div class="flex justify-center items-center gap-1">
             <h3 class="font-semibold text-base">{{ post().author.name }}</h3>
             @if (post().author.verified) {
-          <img class="w-fit h-4" alt="verificacion" src="https://static.xx.fbcdn.net/assets/?set=content_operations_help_center&amp;name=fb-verifiedbadge-desktop&amp;density=1">
-        }
+            <img class="w-fit h-4" alt="verificacion"
+              src="https://static.xx.fbcdn.net/assets/?set=content_operations_help_center&amp;name=fb-verifiedbadge-desktop&amp;density=1">
+            }
           </div>
           <p class="text-xs text-gray-500">{{ post().created_at | date }}</p>
         </div>
@@ -31,8 +46,11 @@
       </p>
 
       <div class="mt-2 flex gap-2 flex-wrap">
-        @for (tag of post().tags; track tag) {
+        @for (tag of post().tags.slice(0, 2); track tag) {
           <span class="badge badge-outline text-xs text-primary">{{ tag }}</span>
+        }
+        @if (post().tags.length > 2) {
+          <div class="bg-gray-300 p-1 text-xs rounded text-gray-600 font-medium">+{{post().tags.length - 2}}</div>
         }
       </div>
 
@@ -40,12 +58,13 @@
   </div>
 
   <!-- Imagen post -->
-  <div class="w-2/4 h-50 flex items-center justify-center">
+  <div class="w-1/4 h-full flex items-center justify-center">
     @if (post().media && post().media!.type.startsWith('image')) {
-      <img
-        [src]="post().media!.file_base64"
-        alt="post"
-        class="w-full h-full object-cover">
+      <img [src]="post().media!.file_base64" alt="post" class="w-full h-full object-cover">
+    } @else if (post().media!.type.startsWith('video')) {
+      <div class="w-full h-full min-h-55 bg-gray-300 flex items-center justify-center text-sm font-bold">
+        <video class="w-full h-full object-cover" [src]="post().media?.file_base64" autoplay muted loop playsinline></video>
+      </div>
     } @else {
       <div class="w-full h-full min-h-55 bg-gray-300 flex items-center justify-center text-sm font-bold">
         Sin imagen
@@ -54,3 +73,41 @@
   </div>
 
 </div>
+
+@if (mostrarModal) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="cerrarModal()">
+  <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" (click)="$event.stopPropagation()">
+    <div class="flex items-start gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M6 7h12M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-7 0h8m-9 0l1 12a1 1 0 001 1h6a1 1 0 001-1l1-12" />
+        </svg>
+      </div>
+
+      <div class="flex-1">
+        <h2 class="text-lg font-semibold text-gray-800">
+          Eliminar publicación
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+          ¿Seguro que quieres eliminar esta publicación? Esta acción no se podrá deshacer.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button type="button"
+        class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        (click)="cerrarModal()">
+        Cancelar
+      </button>
+
+      <button type="button" class="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+        (click)="confirmarEliminacion()">
+        Eliminar
+      </button>
+    </div>
+  </div>
+</div>
+}

@@ -39,8 +39,20 @@ export class SelectPost {
   }
 
   selectNewPost(): void {
+    // Actualiza el post a null
     this.selectedPost = null;
+    // Envia el post seleccionado al componente padre
     this.postSelected.emit(null);
   }
 
+  onDeletePost(post: Post): void {
+    this.savedPosts = this.savedPosts.filter(p => p.id !== post.id);
+
+    localStorage.setItem('generatedPost', JSON.stringify(this.savedPosts));
+
+    if (this.selectedPost?.id === post.id) {
+      this.selectedPost = null;
+    }
+
+  }
 }

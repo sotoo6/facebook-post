@@ -1,4 +1,4 @@
-<form class="fieldset flex flex-col gap-2 bg-base-200 border-base-300 rounded-box w-xl border p-6" autocomplete="off"
+<form class="fieldset flex flex-col gap-2 bg-base-200 border-base-300 rounded-box w-3xl border p-6 shadow-lg" autocomplete="off"
   [formGroup]="myForm" (ngSubmit)="onSubmit()">
   <h2 class="inline-block mb-3 text-xl md:text-xl font-bold text-slate-500 relative">Crea un nuevo post</h2>
 
@@ -35,79 +35,79 @@
   <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['userAcount'].errors!) }}</span>
   }
 
-  <!-- Imagen de perfil -->
-  <div class="flex flex-col gap-3">
-    <div class="flex gap-1">
-      <span class="label text-base mr-3">Imagen de perfil</span>
+  <div class="flex gap-3">
+    <!-- Imagen de perfil -->
+    <div class="flex flex-col gap-3">
+      <div class="flex gap-1 flex-col">
+        <span class="label text-base mr-3">Foto de perfil</span>
 
-      <input
-        type="file"
-        accept="image/*"
-        class="file-input file-input-secondary w-full h-8"
-        (change)="onUserImageSelected($event)"
-      />
-    </div>
-
-    @if (previewUserImage) {
-      <div class="border border-secondary rounded-md p-2 w-full h-fit flex flex-col items-center gap-3">
-        <p class="text-sm font-medium">
-          {{ selectedUserImageName }}
-        </p>
-
-        <img
-          [src]="previewUserImage"
-          alt="Vista previa de la imagen de perfil"
-          class="w-fit h-25 object-cover rounded-md border"
+        <input
+          type="file"
+          accept="image/*"
+          class="file-input file-input-secondary w-full h-8"
+          (change)="onUserImageSelected($event)"
         />
       </div>
-    }
-  </div>
-  <!-- Texto error de foto de perfil -->
-  @if (formUtils.isValidField(myForm, 'userImage')) {
-  <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['userImage'].errors!) }}</span>
-  }
 
-  <!-- Input imagen/video del post -->
-  <div class="flex flex-col gap-3">
-    <div class="flex gap-1">
-      <span class="label text-base mr-3">Imagen para el post</span>
+      @if (previewUserImage) {
+        <div class="border border-secondary rounded-md p-2 w-full h-full flex flex-col items-center gap-3">
+          <p class="text-xs font-medium">
+            {{ selectedUserImageName }}
+          </p>
 
-      <input
-        type="file"
-        accept="image/*,video/*"
-        class="file-input file-input-secondary w-full h-8"
-        (change)="onPostMediaSelected($event)"
-      />
-    </div>
-
-    @if (previewPostMedia) {
-      <div class="border border-secondary rounded-md p-2 w-full h-fit flex flex-col items-center gap-3">
-        <p class="text-sm font-medium">
-          {{ selectedPostMediaName }}
-        </p>
-
-        @if (postMediaType === 'image') {
           <img
-            [src]="previewPostMedia"
-            alt="Vista previa del archivo"
+            [src]="previewUserImage"
+            alt="Vista previa de la imagen de perfil"
             class="w-fit h-25 object-cover rounded-md border"
           />
-        }
+        </div>
+      }
+      <!-- Texto error de foto de perfil -->
+      @if (formUtils.isValidField(myForm, 'userImage')) {
+        <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['userImage'].errors!) }}</span>
+      }
+    </div>
 
-        @if (postMediaType === 'video') {
-          <video
-            [src]="previewPostMedia"
-            controls
-            class="w-fit h-25 rounded-md border"
-          ></video>
-        }
+    <!-- Input imagen/video del post -->
+    <div class="flex flex-col gap-3">
+      <div class="flex gap-1 flex-col">
+        <span class="label text-base mr-3">Archivo para el post</span>
+
+        <input
+          type="file"
+          accept="image/*,video/*"
+          class="file-input file-input-secondary w-full h-8"
+          (change)="onPostMediaSelected($event)"
+        />
       </div>
-    }
+
+      @if (previewPostMedia) {
+        <div class="border border-secondary rounded-md p-2 w-full h-full flex flex-col items-center gap-3">
+          <p class="text-xs font-medium">
+            {{ selectedPostMediaName }}
+          </p>
+
+          @if (postMediaType === 'image') {
+            <img
+              [src]="previewPostMedia"
+              alt="Vista previa del archivo"
+              class="w-fit h-25 object-cover rounded-md border"
+            />
+          }
+
+          @if (postMediaType === 'video') {
+            <video
+              [src]="previewPostMedia" autoplay loop class="w-fit h-25 rounded-md border"
+            ></video>
+          }
+        </div>
+      }
+      <!-- Texto error de foto del post -->
+      @if (formUtils.isValidField(myForm, 'postMedia')) {
+        <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['postMedia'].errors!) }}</span>
+      }
+    </div>
   </div>
-  <!-- Texto error de foto del post -->
-  @if (formUtils.isValidField(myForm, 'postMedia')) {
-    <span class="form-text text-error pb-2">{{ formUtils.getTextError(myForm.controls['postMedia'].errors!) }}</span>
-  }
 
   <!-- TextArea Descripción -->
   <textarea class="textarea w-full" placeholder="Descripción" formControlName="description">
@@ -123,45 +123,49 @@
     <input type="checkbox" class="checkbox checkbox-primary" formControlName="verified" />
   </div>
 
-  <!-- Input tags -->
-  <label class="input validator w-full">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-      class="icon icon-tabler icons-tabler-outline icon-tabler-tags">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path
+  <!-- Tags -->
+  <div class="flex flex-col gap-1.5">
+    <!-- Input tags -->
+    <label class="input validator w-full">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="icon icon-tabler icons-tabler-outline icon-tabler-tags">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path
         d="M3 8v4.172a2 2 0 0 0 .586 1.414l5.71 5.71a2.41 2.41 0 0 0 3.408 0l3.592 -3.592a2.41 2.41 0 0 0 0 -3.408l-5.71 -5.71a2 2 0 0 0 -1.414 -.586h-4.172a2 2 0 0 0 -2 2" />
-      <path d="M18 19l1.592 -1.592a4.82 4.82 0 0 0 0 -6.816l-4.592 -4.592" />
-      <path d="M7 10h-.01" />
-    </svg>
+        <path d="M18 19l1.592 -1.592a4.82 4.82 0 0 0 0 -6.816l-4.592 -4.592" />
+        <path d="M7 10h-.01" />
+      </svg>
 
-    <input #tagInput type="text" placeholder="Tags sobre el post" />
-  </label>
-  <!-- Texto error de tags -->
-  @if (formUtils.isValidField(myForm, 'tags')) {
-  <span class="form-text text-error py-0.5">
-    {{ formUtils.getTextError(myForm.controls['tags'].errors!) }}
-  </span>
-  }
+      <input #tagInput type="text" placeholder="Tags sobre el post" />
+    </label>
+    <!-- Texto error de tags -->
+    @if (formUtils.isValidField(myForm, 'tags')) {
+      <span class="form-text text-error py-0.5">
+        {{ formUtils.getTextError(myForm.controls['tags'].errors!) }}
+      </span>
+    }
 
-  <div class="flex gap-2">
-    <div class="mt-1.5 flex gap-2 flex-wrap">
-      <button type="button" class="btn btn-sm btn-primary" (click)="addTagFromButton(tagInput)">
-        Añadir tag
-      </button>
-    </div>
-
-    <div class="mt-1 flex flex-wrap gap-2">
-      @for (tag of tagsList; track tag) {
-      <div class="badge badge-outline badge-primary gap-2 px-3 py-3">
-        {{ tag }}
-        <button type="button" class="ml-1 text-xs hover:cursor-pointer" (click)="removeTag(tag)">
-          ✕
+    <div class="flex gap-2 items-center">
+      <div class="mt-1.5 flex gap-2 flex-wrap">
+        <button type="button" class="btn btn-sm btn-primary" (click)="addTagFromButton(tagInput)">
+          Añadir tag
         </button>
       </div>
-      }
+
+      <div class="mt-1 flex flex-wrap gap-2">
+        @for (tag of tagsList; track tag) {
+          <div class="badge badge-outline badge-primary gap-2 px-3 py-3">
+            {{ tag }}
+            <button type="button" class="ml-1 text-xs hover:cursor-pointer" (click)="removeTag(tag)">
+              ✕
+            </button>
+          </div>
+        }
+      </div>
     </div>
   </div>
 
   <button class="btn btn-accent mt-4" (click)="onSubmit()">{{ postToEdit() ? 'Modificar Post' : 'Crear Post' }}</button>
+
 </form>

@@ -45,13 +45,15 @@ export class FacebookForm implements OnInit {
   // Indica si el archivo del post es una imagen, un vídeo o ninguno
   postMediaType: 'image' | 'video' | '' = '';
 
-  post = this.postToEdit();
-
   constructor() {
+    // Se ejecuta cuando cambia el postToEdit()
     effect(() => {
+      // Guarda el post recibido
       const post = this.postToEdit();
 
+      // Si no hay post, es que se va a crear uno nuevo
       if (!post) {
+        // Resetea todos los valores del formulario
         this.myForm.reset({
           userName: '',
           userAcount: '',
@@ -62,6 +64,7 @@ export class FacebookForm implements OnInit {
           verified: false
         });
 
+        // Reseteamos todos los valores de tag, imagen y media
         this.tagsList = [];
         this.userImageBase64 = '';
         this.previewUserImage = '';
@@ -74,8 +77,10 @@ export class FacebookForm implements OnInit {
         return;
       }
 
+      // Si hya post, copia sus tags
       this.tagsList = [...post.tags];
 
+      // Rellena los campos del formulario con datos del post enviado
       this.myForm.patchValue({
         userName: post.author.name,
         userAcount: post.author.username,
@@ -86,14 +91,22 @@ export class FacebookForm implements OnInit {
         tags: post.tags
       });
 
+
+      // Guarda la imagen de perfil en base64
       this.userImageBase64 = post.author.avatar ?? '';
+      // Muestra la vista previa de la imagen de perfil
       this.previewUserImage = post.author.avatar ?? '';
+      // Muestra un texto indicando que la imagen de perfil ya está cargada
       this.selectedUserImageName = post.author.avatar ? 'Imagen cargada' : '';
 
+      // Guarda el archivo multimedia del post en base64
       this.postMediaBase64 = post.media?.file_base64 ?? '';
+      // Muestra la vista previa del archivo multimedia
       this.previewPostMedia = post.media?.file_base64 ?? '';
+      // Muestra un texto indicando que el archivo multimedia ya está cargado
       this.selectedPostMediaName = post.media?.file_base64 ? 'Archivo cargado' : '';
 
+     // Detecta si el archivo del post es una imagen o un vídeo
       if (post.media?.type.startsWith('image')) {
         this.postMediaType = 'image';
       } else if (post.media?.type.startsWith('video')) {
