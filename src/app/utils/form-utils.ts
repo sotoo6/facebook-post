@@ -12,7 +12,7 @@ export class FormUtils {
 
   // Expresiones regulares
   static userNamePattern = '^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ ]{3,50}$'
-  static nameAcountPattern = '^[a-zA-Z0-9._]{3,15}$'
+  static nameAcountPattern = '^[a-zA-Z0-9._]{3,25}$'
 
   static getTextError(errors: ValidationErrors) {
     for (const key of Object.keys(errors)) {
