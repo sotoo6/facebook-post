@@ -1,4 +1,3 @@
-// import { HttpClient } from '@angular/common/http';
 import { effect, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Post } from '../models/post.model';
@@ -23,6 +22,16 @@ export class FacebookPostService {
     localStorage.setItem('generatedPost', historyString);
   });
 
+  selectedPost: Post | null = null;
+
+  setSelectedPost(post: Post): void {
+    this.selectedPost = post;
+  }
+
+  getSelectedPost(): Post | null {
+    return this.selectedPost;
+  }
+
   // Añade un nuevo post
   addPost(post: Post): void {
     this.postHistory.update(posts => [...posts, post]);
@@ -40,5 +49,7 @@ export class FacebookPostService {
         post.id === updatedPost.id ? updatedPost : post
       )
     );
+    // ✅ Actualiza también el post seleccionado
+    this.selectedPost = updatedPost;
   }
 }

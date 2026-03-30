@@ -1,12 +1,17 @@
-<div class="flex flex-col w-fit text-center my-4 mx-auto">
-  <h1 class="inline-block text-2xl md:text-3xl font-bold text-slate-500 relative">
-    Crea una publicación en Facebook
-    <span class="block w-full h-1 mt-1.5 rounded-full bg-blue-300/70"></span>
-  </h1>
-  <small class="text-gray-500">Crea un nuevo post o selecciona uno existente para editarlo</small>
+<div class="h-screen overflow-hidden max-w-385 mx-auto px-4 py-4 flex flex-col">
+  <div class="flex flex-col w-fit text-center mb-4 mx-auto shrink-0">
+    <h1 class="inline-block text-2xl md:text-3xl font-bold text-slate-500 relative">
+      Crea una publicación en Facebook
+      <span class="block w-full h-1 mt-1.5 rounded-full bg-blue-300/70"></span>
+    </h1>
+    <small class="text-gray-500">
+      Crea un nuevo post o selecciona uno existente para editarlo
+    </small>
+  </div>
+
+  <section class="mx-auto max-w-400 grid grid-cols-1 xl:grid-cols-[1.3fr_1.05fr] gap-6 items-start flex-1 min-h-0 mt-3">
+    <facebook-form [postToEdit]="selectedPost" />
+    <select-post (postSelected)="onPostSelected($event)" />
+  </section>
 </div>
-<section class="flex mt-10 justify-center gap-8 w-full">
-  <facebook-form [postToEdit]="selectedPost" />
-  <select-post (postSelected)="onPostSelected($event)" />
-</section>
 

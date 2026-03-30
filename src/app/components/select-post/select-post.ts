@@ -32,9 +32,8 @@ export class SelectPost {
   }
 
   selectPost(post: Post): void {
-    // Actualiza el post seleccionado
     this.selectedPost = post;
-    // Envia el post seleccionado al componente padre
+    this.facebookPostService.setSelectedPost(post);
     this.postSelected.emit(post);
   }
 

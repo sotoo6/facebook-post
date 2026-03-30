@@ -38,20 +38,17 @@ export class DesktopFacebookPost implements OnInit {
   };
 
   ngOnInit(): void {
-    // Busca en localStorage el post guardado desde el formulario
-    const savedPosts: Post[] = this.facebookPostService.getPost();
+    const selectedPost = this.facebookPostService.getSelectedPost();
 
-    const lastIndex = savedPosts.length - 1;
+    if (selectedPost) {
+      this.data = selectedPost;
+      return;
+    }
 
-    if (lastIndex >=0 ){
-      const savedPost = (savedPosts.length > 0) ? savedPosts[lastIndex] : null;
-      console.log(savedPost);
-
-      // Si existe, lo convierte de texto a objeto
-      if (savedPost) {
-        // Como el JSON viene dentro de "post", cogemos solo esa parte
-        this.data = savedPost
-      }
+    // Fallback: si no hay seleccionado, coge el último (para accesos directos a la ruta)
+    const savedPosts = this.facebookPostService.getPost();
+    if (savedPosts.length > 0) {
+      this.data = savedPosts[savedPosts.length - 1];
     }
   }
 }

@@ -1,7 +1,7 @@
 import { Component, effect, EventEmitter, inject, input, OnInit, Output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtils } from '../../utils/form-utils';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Post } from '../../models/post.model';
 import { FacebookPostService } from '../../services/facebook-post.service';
 import { GeminiService } from '../../services/gemini.service';
@@ -18,7 +18,7 @@ const AVATARES_RANDOM = [
 
 @Component({
   selector: 'facebook-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './facebook-form.html',
 })
 export class FacebookForm implements OnInit {
@@ -130,8 +130,39 @@ export class FacebookForm implements OnInit {
       } else {
         this.postMediaType = '';
       }
+
     });
   }
+
+  printLocalStorageSizes(): void {
+  const savedPosts = localStorage.getItem('generatedPost');
+
+  if (!savedPosts) {
+    console.log('No hay posts guardados en localStorage');
+    return;
+  }
+
+  console.log('Tamaño total de generatedPost:', savedPosts.length);
+
+  const posts: Post[] = JSON.parse(savedPosts);
+
+  posts.forEach((post, i) => {
+    console.log(`Post ${i}`);
+    console.log('post entero:', JSON.stringify(post).length);
+
+    if (post.author) {
+      console.log('author:', JSON.stringify(post.author).length);
+    }
+
+    if (post.media) {
+      console.log('media:', JSON.stringify(post.media).length);
+    }
+
+    if (post.comments) {
+      console.log('comments:', JSON.stringify(post.comments).length);
+    }
+  });
+}
 
   // Definición del formulario reactivo principal
   myForm = this.fb.group({
@@ -150,6 +181,7 @@ export class FacebookForm implements OnInit {
     const savedPosts = localStorage.getItem('generatedPost') || "[]";
     this.posts = JSON.parse(savedPosts);
     console.log(this.posts);
+    this.printLocalStorageSizes();
 
   }
 
